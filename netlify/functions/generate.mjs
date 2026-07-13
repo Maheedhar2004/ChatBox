@@ -40,6 +40,9 @@ export default async (request) => {
     }
 
     const responseBody = await upstream.text();
+    if (upstream.status >= 400) {
+      console.error("Upstream error:", responseBody);
+    }
     return new Response(responseBody, {
       status: upstream.status,
       headers: { "Content-Type": "application/json; charset=utf-8" },

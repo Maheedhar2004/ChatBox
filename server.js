@@ -5,8 +5,10 @@ const { readFile } = require("node:fs/promises");
 const PORT = Number(process.env.PORT || 3000);
 const ROOT_DIR = __dirname;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL_NAME = "gemini-3.5-flash";
-const FALLBACK_MODEL_NAME = "gemini-3.1-flash-lite";
+console.log("Key exists:", !!process.env.GEMINI_API_KEY);
+console.log("Key prefix:", process.env.GEMINI_API_KEY?.substring(0, 5));
+const MODEL_NAME = "gemini-2.5-flash";
+const FALLBACK_MODEL_NAME = "gemini-2.5-flash";
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
