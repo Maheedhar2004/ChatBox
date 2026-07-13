@@ -1,6 +1,6 @@
 # Mahi Assistant
 
-Mahi Assistant is a browser-based chat interface with Gemini-powered replies, image analysis, optional voice input/output, response-language selection, and a face-detection camera page.
+**Mahi Assistant is a browser-based chat interface with Gemini-powered replies, image analysis, optional voice input/output, response-language selection, and a face-detection camera page.**
 
 ## Requirements
 
