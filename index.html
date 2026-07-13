@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <title>Mahi Assistant</title>
+  <style>
+    :root { --bg:#f8fafc; --panel:#ffffff; --ink:#172033; --muted:#7b8495; --line:#e7eaf0; --brand:#635bff; --brand-dark:#4f46e5; }
+    * { box-sizing:border-box; }
+    body { min-width:320px; min-height:100vh; margin:0; overflow:hidden; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); }
+    .app { width:100vw; height:100vh; display:grid; grid-template-columns:260px minmax(0,1fr); overflow:hidden; background:var(--bg); }
+    .sidebar { display:flex; flex-direction:column; padding:22px 16px 16px; color:#e9ecf6; background:#111827; }
+    .brand { display:flex; align-items:center; gap:11px; padding:4px 9px 26px; color:#fff; font-size:17px; font-weight:750; letter-spacing:.01em; }
+    .brand-icon { width:34px; height:34px; display:grid; place-items:center; border-radius:11px; color:#fff; background:linear-gradient(135deg,#8b85ff,#5148ef); font-size:17px; }
+    .new-chat { width:100%; display:flex; align-items:center; gap:9px; padding:12px 13px; border:1px solid rgba(255,255,255,.13); border-radius:11px; color:#fff; background:rgba(255,255,255,.07); font:inherit; cursor:pointer; text-align:left; }.new-chat:hover { background:rgba(255,255,255,.12); }
+    .sidebar-label { margin:28px 9px 10px; color:#7f899c; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }.sidebar-note { margin:0 9px; color:#9aa3b4; font-size:13px; line-height:1.55; }
+    .sidebar-bottom { display:flex; align-items:center; gap:10px; margin-top:auto; padding:12px 9px; border-top:1px solid rgba(255,255,255,.1); color:#b9c0cf; font-size:13px; }.online-dot { width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 0 3px rgba(52,211,153,.13); }
+    .workspace { min-width:0; min-height:0; display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(145deg,#fbfcff 0%,#f5f7ff 100%); }
+    .topbar { display:flex; align-items:center; justify-content:space-between; height:76px; padding:0 34px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.72); backdrop-filter:blur(10px); }.chat-title { margin:0; font-size:16px; font-weight:700; }.chat-subtitle { margin:3px 0 0; color:var(--muted); font-size:12px; }.topbar-status { display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:999px; color:#4b5568; background:#f1f5f9; font-size:12px; }.topbar-status::before { content:""; width:7px; height:7px; border-radius:50%; background:#22c55e; }
+    .chat-container { min-height:0; flex:1; display:flex; flex-direction:column; overflow:hidden; }.chat-body { width:min(100%,980px); min-height:0; flex:1 1 0; align-self:center; padding:42px max(28px,5vw) 26px; overflow-y:auto; }
+    .welcome { max-width:650px; margin:7vh auto 0; text-align:center; }.welcome-icon { width:58px; height:58px; display:grid; place-items:center; margin:0 auto 18px; border-radius:19px; color:#fff; background:linear-gradient(135deg,#8179ff,#5148ef); box-shadow:0 16px 34px rgba(99,91,255,.25); font-size:26px; }.welcome h2 { margin:0; font-size:29px; letter-spacing:-.04em; }.welcome p { max-width:510px; margin:11px auto 0; color:var(--muted); font-size:15px; line-height:1.6; }
+    .message { width:fit-content; max-width:min(76%,700px); margin:0 0 17px; padding:12px 15px; border-radius:17px; line-height:1.5; font-size:15px; word-break:break-word; }.user-message { margin-left:auto; border-bottom-right-radius:5px; color:#fff; background:linear-gradient(135deg,var(--brand),var(--brand-dark)); box-shadow:0 7px 18px rgba(79,70,229,.18); }.bot-message { margin-right:auto; border:1px solid var(--line); border-bottom-left-radius:5px; color:#2e384a; background:#fff; box-shadow:0 4px 12px rgba(23,32,51,.04); }.attachment { display:block; max-width:260px; max-height:190px; margin-top:9px; border-radius:11px; object-fit:cover; }.file-preview { display:block; width:44px; height:44px; margin:0 2px; border-radius:9px; object-fit:cover; }.file-name { max-width:140px; overflow:hidden; margin:0 4px; color:var(--muted); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+    .thinking-indicator { display:flex; align-items:center; gap:5px; height:18px; }.dot { width:6px; height:6px; border-radius:50%; background:#94a3b8; animation:blink 1.1s infinite; }.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}@keyframes blink{50%{opacity:.25;transform:translateY(-2px)}}
+    .chat-footer { width:min(100%,980px); flex:0 0 auto; display:flex; align-items:center; gap:10px; align-self:center; padding:13px max(28px,5vw) 24px; background:transparent; }.clip-container { position:relative; }.message-input { min-width:0; flex:1; height:52px; padding:0 16px; border:1px solid #dce1eb; border-radius:15px; outline:none; color:var(--ink); background:#fff; box-shadow:0 4px 14px rgba(23,32,51,.05); font:inherit; transition:.2s; }.message-input:focus { border-color:#9892ff; box-shadow:0 0 0 4px #e8e7ff; }.icon-button,#send-message { width:52px; height:52px; display:grid; place-items:center; border:0; border-radius:15px; cursor:pointer; font:inherit; transition:transform .15s,background .15s; }.icon-button { color:#4c5566; background:#fff; box-shadow:0 4px 14px rgba(23,32,51,.05); font-size:27px; }.icon-button:hover { background:#f4f5ff; color:var(--brand); }.icon-button:active,#send-message:active { transform:scale(.95); }#send-message { color:#fff; background:var(--brand); box-shadow:0 7px 17px rgba(79,70,229,.24); font-size:19px; }#send-message:hover { background:var(--brand-dark); }#send-message:disabled { opacity:.6; cursor:wait; }
+    .clip-dropdown { position:absolute; bottom:63px; left:0; display:none; width:min(380px,calc(100vw - 32px)); padding:10px; border:1px solid #dde1e8; border-radius:18px; background:#fff; box-shadow:0 20px 55px rgba(23,32,51,.18); z-index:5; }.clip-container.is-open .clip-dropdown { display:block; }.clip-dropdown::before { content:"Available tools"; display:block; padding:4px 10px 8px; color:#929aaa; font-size:11px; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }.tool-option { display:flex; align-items:center; width:100%; min-height:56px; padding:8px 10px; border:0; border-radius:12px; color:#20242c; background:transparent; cursor:pointer; font:inherit; text-align:left; }.tool-option:hover { background:#f5f6f8; }.tool-icon { width:34px; flex:0 0 34px; text-align:center; font-size:21px; }.tool-copy { min-width:0; margin-left:9px; }.tool-name { display:block; font-size:15px; font-weight:650; }.tool-hint { display:block; margin-top:2px; overflow:hidden; color:#9297a0; font-size:13px; text-overflow:ellipsis; white-space:nowrap; }.tool-divider { height:1px; margin:7px 8px; background:var(--line); }.language-option { display:flex; align-items:center; gap:10px; padding:8px 10px; color:#4b5568; font-size:13px; font-weight:650; }.language-option select { min-width:0; flex:1; padding:8px; border:1px solid var(--line); border-radius:9px; color:#4b5568; background:#fff; font:inherit; }.hidden { display:none!important; }.recording { color:#fff!important; background:#dc2626!important; animation:pulse 1.2s infinite; }@keyframes pulse{50%{box-shadow:0 0 0 7px #fee2e2}}
+    @media (max-width:720px) { .app { grid-template-columns:1fr; }.sidebar { display:none; }.topbar { height:66px; padding:0 18px; }.chat-body { padding:26px 18px 16px; }.welcome { margin:11vh auto 0; }.welcome h2 { font-size:25px; }.chat-footer { padding:11px 18px 18px; }.message { max-width:86%; }.topbar-status { display:none; }.clip-dropdown { left:0; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">&#10022;</span>Mahi Assistant</div>
+      <button class="new-chat" type="button" onclick="location.reload()"><span>&#43;</span> New conversation</button>
+      <p class="sidebar-label">Your assistant</p>
+      <p class="sidebar-note">Ask questions, attach an image, or use your voice to send a message.</p>
+      <div class="sidebar-bottom"><span class="online-dot"></span>Assistant is ready</div>
+    </aside>
+    <section class="workspace">
+      <header class="topbar"><div><h1 class="chat-title">New conversation</h1><p class="chat-subtitle">Mahi Assistant</p></div><div class="topbar-status">Online</div></header>
+      <section class="chat-container" aria-label="Chat">
+        <div class="chat-body" aria-live="polite"><div class="welcome"><div class="welcome-icon">&#10022;</div><h2>What can I help you with?</h2><p>Ask anything, upload an image for analysis, or use the microphone to start talking.</p></div></div>
+        <form class="chat-footer">
+          <div class="clip-container">
+            <button id="clip-button" class="icon-button" type="button" aria-label="Open chat tools" aria-expanded="false">&#43;</button>
+            <div class="clip-dropdown">
+              <button id="file-upload" class="tool-option" type="button"><span class="tool-icon">&#128206;</span><span class="tool-copy"><span class="tool-name">Add photos &amp; files</span><span class="tool-hint">Upload an image from your computer</span></span></button>
+              <input type="file" id="file-input" class="hidden" accept="image/*">
+              <button id="clear-file" class="tool-option hidden" type="button"><span class="tool-icon">&#10005;</span><span class="tool-copy"><span class="tool-name">Remove attachment</span><span class="tool-hint">Clear the selected image</span></span></button>
+              <button id="camera-button" class="tool-option" type="button"><span class="tool-icon">&#128247;</span><span class="tool-copy"><span class="tool-name">Face detection</span><span class="tool-hint">Open the camera tool</span></span></button>
+              <button id="voice-input" class="tool-option" type="button"><span class="tool-icon">&#127908;</span><span class="tool-copy"><span class="tool-name">Voice input</span><span class="tool-hint">Speak your message</span></span></button>
+              <button id="toggle-tts" class="tool-option" type="button"><span class="tool-icon">&#128266;</span><span class="tool-copy"><span class="tool-name">Voice replies</span><span class="tool-hint">Enable spoken assistant replies</span></span></button>
+              <div class="tool-divider"></div>
+              <label class="language-option">Response language <select id="language-selector" aria-label="Response language"><option value="en">English</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="hi">Hindi</option><option value="ja">Japanese</option><option value="zh">Chinese</option></select></label>
+            </div>
+          </div>
+          <input type="text" class="message-input" placeholder="Ask anything..." aria-label="Message" autocomplete="off">
+          <button id="send-message" type="submit" aria-label="Send message">&#10148;</button>
+        </form>
+      </section>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
